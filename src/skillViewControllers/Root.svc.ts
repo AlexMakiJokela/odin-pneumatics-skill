@@ -3,28 +3,43 @@ import {
 	ViewControllerOptions,
 	SkillView,
 	CardViewController,
+	buildActiveRecordCard,
 	SkillViewControllerLoadOptions,
 	CardSection,
+	ListViewController,
+	buildActiveRecordList,
+	ListRow,
 } from '@sprucelabs/heartwood-view-controllers'
 
 export default class RootSkillViewController extends AbstractSkillViewController {
 	public static id = 'root'
 	protected cardVc: CardViewController
+	protected listVc: ListViewController
 	private fillBallastLabel: string = 'Fill Ballast'
 
 	public constructor(options: ViewControllerOptions) {
 		super(options)
+		this.listVc = this.ListVc()
 		this.cardVc = this.CardVc()
 	}
 
-	// private CardVc(): CardViewController {
-	// 	const sections: CardSection[] = [
-	// 		{
-	// 			shouldBePadded: false,
-	// 			list: this.renderList(),
-	// 		},
-	// 	]
-	// }
+	private ListVc(): ListViewController {
+		return this.Controller(
+			'active-record-list',
+			buildActiveRecordList({
+				eventName: 'pneuamtics.update-pneumatics-data::v2024_04_06',
+				rowTransformer: this.renderRow.bind(this),
+				responseKey: 'yarrrr',
+				columnWidths: ['content', 'fill'],
+			})
+		)
+		// 	id: 'controls',
+		// 	header: {
+		// 		title: 'Controls',
+		// 	},
+		// 	body: sections,
+		// })
+	}
 
 	private CardVc(): CardViewController {
 		return this.Controller('card', {
@@ -32,89 +47,47 @@ export default class RootSkillViewController extends AbstractSkillViewController
 			header: {
 				title: 'Controls',
 			},
-			body: this.renderBody(),
+			body: {
+				sections: [
+					{
+						list: this.listVc.render(),
+					},
+				],
+			},
 		})
 	}
 
-	private renderBody() {
+	private renderRow(shockAssembly: ShockAssembly): ListRow {
 		return {
-			sections: [
+			id: 'thingy',
+			cells: [
 				{
-					list: {
-						rows: [
-							{
-								id: 'ballastPressure',
-								height: 'content',
-								cells: [
-									{
-										lineIcon: 'start',
-									},
-									{
-										text: { content: 'Ballast Pressure: ' },
-									},
-									{
-										text: { content: '0 psi' },
-									},
-									{
-										button: {
-											id: 'fillBallast',
-											label: this.fillBallastLabel,
-											onClick: this.handleFillBallast.bind(this),
-										},
-									},
-								],
-							},
-							{
-								id: 'shockPressure',
-								height: 'content',
-								cells: [
-									{
-										lineIcon: 'start',
-									},
-									{
-										text: { content: 'Shock Pressure: ' },
-									},
-									{
-										text: { content: '0 psi' },
-									},
-									{
-										button: {
-											id: 'fillShock',
-											label: 'Fill Shock',
-											onClick: this.handleFillShock.bind(this),
-										},
-									},
-									{
-										button: {
-											id: 'ventShock',
-											label: 'Vent Shock',
-											onClick: this.handleVentShock.bind(this),
-										},
-									},
-								],
-							},
-						],
+					text: { content: `Ballast: ${shockAssembly.ballastPressure}` },
+				},
+				{
+					text: { content: `Shock: ${shockAssembly.shockPressure}` },
+				},
+				{
+					button: {
+						id: 'fillBallast',
+						label: shockAssembly.ballastFillValveState,
+						onClick: this.handleFillBallast.bind(this),
 					},
 				},
-				// {
-				// 	buttons: [
-				// 		{
-				// 			id: 'fillBallast',
-				// 			label: this.fillBallastLabel,
-				// 			onClick: this.handleFillBallast.bind(this),
-				// 		},
-				// 		{
-				// 			id: 'fillShock',
-				// 			label: 'Fill Shock',
-				// 			onClick: this.handleFillShock.bind(this),
-				// 		},
-				// 		{
-				// 			id: 'ventShock',
-				// 			label: 'Vent Shock',
-				// 			onClick: this.handleVentShock.bind(this),
-				// 		},
-				// 	],
-				// },
+				{
+					button: {
+						id: 'fillShock',
+						label: shockAssembly.shockFillValveState,
+						onClick: this.handleFillShock.bind(this),
+					},
+				},
+				{
+					button: {
+						id: 'ventShock',
+						label: shockAssembly.shockVentValveState,
+						onClick: this.handleVentShock.bind(this),
+					},
+				},
 			],
 		}
 	}
@@ -143,3 +116,14 @@ export default class RootSkillViewController extends AbstractSkillViewController
 		}
 	}
 }
+
+export type ShockAssembly = {
+	id: string
+	ballastPressure: number
+	shockPressure: number
+	ballastFillValveState: ValveState
+	shockFillValveState: ValveState
+	shockVentValveState: ValveState
+}
+
+export type ValveState = 'Open' | 'Closed'
