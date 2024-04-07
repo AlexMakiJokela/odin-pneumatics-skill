@@ -61,6 +61,8 @@
     "@sprucelabs/test": "^8.0.50",
     "@sprucelabs/test-utils": "^4.0.157",
     "@types/node": "^20.12.5",
+    "@typescript-eslint/eslint-plugin": "^7.5.0",
+    "@typescript-eslint/parser": "^7.5.0",
     "chokidar-cli": "^3.0.0",
     "concurrently": "^8.2.2",
     "eslint": "^9.0.0",
