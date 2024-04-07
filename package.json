@@ -1,9 +1,9 @@
 {
-  "name": "pneuamtics",
+  "name": "pneumatics",
   "description": "pneumatic controls bruh",
   "version": "0.0.1",
   "skill": {
-    "namespace": "pneuamtics"
+    "namespace": "pneumatics"
   },
   "homepage": "https://github.com/[YOUR REPO PATH]",
   "bugs": {

@@ -30,7 +30,7 @@ export default class RootSvcTest extends AbstractSpruceFixtureTest {
 	}
 
 	private static Vc(): SpyRootSkillView {
-		return this.views.Controller('pneuamtics.root', {}) as SpyRootSkillView
+		return this.views.Controller('pneumatics.root', {}) as SpyRootSkillView
 	}
 }
 
